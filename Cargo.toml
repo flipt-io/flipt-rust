@@ -14,11 +14,11 @@ flipt_integration = []
 
 [dependencies]
 anyhow = "1.0.66"
-async-trait = "0.1.58"
 chrono = { version = "0.4.23", default-features = false, features = ["serde", "clock"] }
-httptest = "0.15.4"
 reqwest = { version = "0.11.13", default-features = false, features = ["json"] }
 serde = { version = "1.0.147", features = ["derive"] }
 serde_json = "1.0.89"
-tokio = { version = "1.22.0", default-features = false, features = [ "macros", "rt-multi-thread", "time" ] }
 url = "2.3.1"
+
+[dev-dependencies]
+tokio = { version = "1.22.0", default-features = false, features = [ "macros", "rt-multi-thread", "time" ] }
