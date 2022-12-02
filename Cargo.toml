@@ -2,7 +2,7 @@
 name = "flipt"
 description = "Flipt API client library."
 repository = "https://github.com/flipt-io/flipt-rust.git"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["Brett Buddin <brett@buddin.org>"]
 readme = "README.md"
