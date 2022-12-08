@@ -1,5 +1,7 @@
 # Flipt Rust Library
 
+[![crates.io](https://img.shields.io/crates/v/flipt.svg)](https://crates.io/crates/flipt)
+
 ## Documentation
 
 API documentation is available at <https://www.flipt.io/docs/reference/overview>.
