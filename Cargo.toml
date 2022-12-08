@@ -1,10 +1,10 @@
 [package]
 name = "flipt"
-description = "Flipt API client library."
+description = "Official Rust SDK for Flipt"
 repository = "https://github.com/flipt-io/flipt-rust.git"
 version = "0.3.0"
 edition = "2021"
-authors = ["Brett Buddin <brett@buddin.org>"]
+authors = ["Brett Buddin <brett@buddin.org>", "Flipt Developers <dev@flipt.io>"]
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["flipt"]
