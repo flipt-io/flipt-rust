@@ -1,15 +1,13 @@
-Client library for the [Flipt v1 API](https://www.flipt.io/docs/introduction).
+# Flipt Rust Library
 
-**Resource API (/api/v1):**
+## Documentation
 
-- Flags
-- Variants
-- Segments
-- Constraints
-- Distributions
-- Evaluate
-- Bulk Evaluate
+API documentation is available at <https://www.flipt.io/docs/reference/overview>.
 
-**Authentication API (/auth/v1):**
+## Beta status
 
-- Tokens
+This SDK is in beta, and there may be breaking changes between versions without a major version update. Therefore, we recommend pinning the package version to a specific version in your Cargo.toml file. This way, you can install the same version each time without breaking changes unless you are intentionally looking for the latest version.
+
+## Contributing
+
+TODO
