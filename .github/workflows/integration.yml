@@ -4,23 +4,27 @@ on:
     branches:
       - main
   pull_request:
+
 jobs:
   test:
     name: Test API
     runs-on: ubuntu-latest
     services:
       flipt:
-        image: flipt/flipt:latest
+        image: flipt/flipt:nightly
         env:
           FLIPT_AUTHENTICATION_METHODS_TOKEN_ENABLED: true
+          FLIPT_AUTHENTICATION_METHODS_TOKEN_BOOTSTRAP_TOKEN: 1ntegr@t10n
           FLIPT_AUTHENTICATION_REQUIRED: true
           FLIPT_LOG_ENCODING: json
         ports:
         - 8080:8080
         - 9000:9000
+
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v3
+
       - name: Install Stable Toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -28,21 +32,12 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt, clippy
-      - name: Collect Service Logs
-        if: success()
-        uses: jwalton/gh-docker-logs@v2
-        with:
-          dest: './logs/containers'
-      - name: Capture Token
-        run: |
-          cat ./logs/containers/*
-          TOKEN=$(cat logs/containers/* | jq -rR 'fromjson? | select(.M=="access token created") | .client_token')
-          echo $TOKEN
-          [[ ! -z $TOKEN ]] && echo "FLIPT_AUTH_TOKEN=$TOKEN" >> $GITHUB_ENV
+
       - name: Integration Test 
         uses: actions-rs/cargo@v1
         env:
           FLIPT_ENDPOINT: http://localhost:8080
+          FLIPT_AUTH_TOKEN: 1ntegr@t10n
         with:
           command: test
           args: --features flipt_integration --test "integration*"
