@@ -1,4 +1,4 @@
-use crate::api::{ApiClient, Result};
+use crate::api::{ApiClient, Result, DEFAULT_NAMESPACE};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -11,44 +11,51 @@ impl<'client> ConstraintClient<'client> {
         Self { client }
     }
 
-    pub async fn create(
-        &self,
-        segment_key: &str,
-        create: &ConstraintCreateRequest,
-    ) -> Result<Constraint> {
+    pub async fn create(&self, create: &ConstraintCreateRequest) -> Result<Constraint> {
         let path = format!(
-            "/api/v1/segments/{segment_key}/constraints",
-            segment_key = segment_key
+            "/api/v1/namespaces/{namespace_key}/segments/{segment_key}/constraints",
+            namespace_key = create
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            segment_key = create.segment_key
         );
         self.client.post(&path, Some(create)).await
     }
 
-    pub async fn delete(&self, segment_key: &str, id: &str) -> Result<ConstraintDeletion> {
+    pub async fn delete(&self, delete: &ConstraintDeleteRequest) -> Result<ConstraintDeletion> {
         let path = format!(
-            "/api/v1/segments/{segment_key}/constraints/{id}",
-            segment_key = segment_key,
-            id = id
+            "/api/v1/namespaces/{namespace_key}/segments/{segment_key}/constraints/{id}",
+            namespace_key = delete
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            segment_key = delete.segment_key,
+            id = delete.id
         );
         self.client.delete(&path, None::<&()>).await
     }
 
-    pub async fn update(
-        &self,
-        segment_key: &str,
-        id: &str,
-        update: &ConstraintUpdateRequest,
-    ) -> Result<Constraint> {
+    pub async fn update(&self, update: &ConstraintUpdateRequest) -> Result<Constraint> {
         let path = format!(
-            "/api/v1/segments/{segment_key}/constraints/{id}",
-            segment_key = segment_key,
-            id = id
+            "/api/v1/namespaces/{namespace_key}/segments/{segment_key}/constraints/{id}",
+            namespace_key = update
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            segment_key = update.segment_key,
+            id = update.id
         );
         self.client.put(&path, Some(update)).await
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct ConstraintCreateRequest {
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
+    #[serde(skip_serializing)]
+    pub segment_key: String,
     pub operator: Operator,
     pub property: String,
     #[serde(rename = "type")]
@@ -56,31 +63,34 @@ pub struct ConstraintCreateRequest {
     pub value: String,
 }
 
-impl Default for ConstraintCreateRequest {
-    fn default() -> Self {
-        Self {
-            property: "".into(),
-            value: "".into(),
-            operator: Operator::Eq,
-            comparison_type: ComparisonType::Unknown,
-        }
-    }
-}
-
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct ConstraintUpdateRequest {
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
+    #[serde(skip_serializing)]
+    pub segment_key: String,
+    #[serde(skip_serializing)]
+    pub id: String,
     pub operator: Operator,
     pub property: String,
     #[serde(rename = "type")]
     pub comparison_type: ComparisonType,
     pub value: String,
+}
+
+#[derive(Debug, Default)]
+pub struct ConstraintDeleteRequest {
+    pub namespace_key: Option<String>,
+    pub segment_key: String,
+    pub id: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct ConstraintDeletion {}
 
-#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone, Eq, PartialEq)]
 pub enum ComparisonType {
+    #[default]
     #[serde(rename = "UNKNOWN_COMPARISON_TYPE")]
     Unknown,
     #[serde(rename = "STRING_COMPARISON_TYPE")]
@@ -91,8 +101,9 @@ pub enum ComparisonType {
     Boolean,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone, Eq, PartialEq)]
 pub enum Operator {
+    #[default]
     #[serde(rename = "eq")]
     Eq,
     #[serde(rename = "neq")]

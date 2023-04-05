@@ -1,5 +1,5 @@
 use crate::api::variant::Variant;
-use crate::api::{ApiClient, Result, DEFAULT_LIMIT};
+use crate::api::{ApiClient, Result, DEFAULT_LIMIT, DEFAULT_NAMESPACE};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -13,25 +13,60 @@ impl<'client> FlagClient<'client> {
     }
 
     pub async fn list(&self, list: &FlagListRequest) -> Result<FlagList> {
-        self.client.get("/api/v1/flags", Some(list)).await
+        let path = format!(
+            "/api/v1/namespaces/{namespace_key}/flags",
+            namespace_key = list
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string())
+        );
+        self.client.get(&path, Some(list)).await
     }
 
-    pub async fn get(&self, key: &str) -> Result<Flag> {
-        let path = format!("/api/v1/flags/{key}", key = key);
+    pub async fn get(&self, get: &FlagGetRequest) -> Result<Flag> {
+        let path = format!(
+            "/api/v1/namespaces/{namespace_key}/flags/{key}",
+            namespace_key = get
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            key = get.key
+        );
         self.client.get(&path, None::<&()>).await
     }
 
     pub async fn create(&self, create: &FlagCreateRequest) -> Result<Flag> {
-        self.client.post("/api/v1/flags", Some(create)).await
+        let path = format!(
+            "/api/v1/namespaces/{namespace_key}/flags",
+            namespace_key = create
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+        );
+        self.client.post(&path, Some(create)).await
     }
 
-    pub async fn delete(&self, key: &str) -> Result<FlagDeletion> {
-        let path = format!("/api/v1/flags/{key}", key = key);
+    pub async fn delete(&self, delete: &FlagDeleteRequest) -> Result<FlagDeletion> {
+        let path = format!(
+            "/api/v1/namespaces/{namespace_key}/flags/{key}",
+            namespace_key = delete
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            key = delete.key
+        );
         self.client.delete(&path, None::<&()>).await
     }
 
-    pub async fn update(&self, key: &str, update: &FlagUpdateRequest) -> Result<Flag> {
-        let path = format!("/api/v1/flags/{key}", key = key);
+    pub async fn update(&self, update: &FlagUpdateRequest) -> Result<Flag> {
+        let path = format!(
+            "/api/v1/namespaces/{namespace_key}/flags/{key}",
+            namespace_key = update
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            key = update.key
+        );
         self.client.put(&path, Some(update)).await
     }
 }
@@ -39,24 +74,46 @@ impl<'client> FlagClient<'client> {
 #[derive(Debug, Clone, Deserialize)]
 pub struct FlagDeletion {}
 
+#[derive(Debug, Default)]
+pub struct FlagGetRequest {
+    pub namespace_key: Option<String>,
+    pub key: String,
+}
+
 #[derive(Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FlagCreateRequest {
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
     pub key: String,
     pub name: String,
     pub description: String,
     pub enabled: bool,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct FlagUpdateRequest {
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
+    #[serde(skip_serializing)]
+    pub key: String,
     pub name: String,
     pub description: String,
     pub enabled: bool,
 }
 
+#[derive(Debug, Default)]
+pub struct FlagDeleteRequest {
+    pub namespace_key: Option<String>,
+    pub key: String,
+}
+
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FlagListRequest {
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
     pub offset: usize,
     pub limit: usize,
     pub page_token: String,
@@ -65,6 +122,7 @@ pub struct FlagListRequest {
 impl Default for FlagListRequest {
     fn default() -> Self {
         Self {
+            namespace_key: None,
             offset: 0,
             limit: DEFAULT_LIMIT,
             page_token: "".to_owned(),
@@ -75,6 +133,7 @@ impl Default for FlagListRequest {
 impl FlagListRequest {
     pub fn new() -> Self {
         Self {
+            namespace_key: None,
             offset: 0,
             limit: DEFAULT_LIMIT,
             page_token: "".to_owned(),
@@ -85,6 +144,7 @@ impl FlagListRequest {
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Flag {
+    pub namespace_key: String,
     pub key: String,
     pub name: String,
     pub description: String,
