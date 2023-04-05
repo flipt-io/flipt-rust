@@ -4,6 +4,7 @@ on:
     branches:
       - main
   pull_request:
+
 jobs:
   lint:
     name: Lint Rust
@@ -11,6 +12,7 @@ jobs:
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v3
+
       - name: Install Stable Toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -18,11 +20,13 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt, clippy
+
       - name: Check Formatting
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
+
       - name: Clippy
         uses: actions-rs/cargo@v1
         with:
