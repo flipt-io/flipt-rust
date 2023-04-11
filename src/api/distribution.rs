@@ -38,7 +38,10 @@ impl<'client> DistributionClient<'client> {
 
     pub async fn update(&self, update: &DistributionUpdateRequest) -> Result<Distribution> {
         let path = format!("/api/v1/namespaces/{namespace_key}/flags/{flag_key}/rules/{rule_id}/distributions/{id}",
-            namespace_key = update.namespace_key.as_ref().unwrap_or(&DEFAULT_NAMESPACE.to_string()), flag_key = update.flag_key, rule_id = update.rule_id, id = update.id);
+            namespace_key = update.namespace_key.as_ref().unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            flag_key = update.flag_key,
+            rule_id = update.rule_id,
+            id = update.id);
         self.client.put(&path, Some(update)).await
     }
 }
