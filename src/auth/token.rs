@@ -16,7 +16,7 @@ impl<'client> TokenClient<'client> {
     }
 
     pub async fn get(&self, id: &str) -> Result<Authentication> {
-        let path = format!("/auth/v1/tokens/{id}", id = id);
+        let path = format!("/auth/v1/tokens/{id}");
         self.client.get(&path, None::<&()>).await
     }
 
@@ -27,7 +27,7 @@ impl<'client> TokenClient<'client> {
     }
 
     pub async fn delete(&self, id: &str) -> Result<AuthenticationDeletion> {
-        let path = format!("/auth/v1/tokens/{id}", id = id);
+        let path = format!("/auth/v1/tokens/{id}");
         self.client.delete(&path, None::<&()>).await
     }
 }

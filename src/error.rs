@@ -13,9 +13,9 @@ impl std::error::Error for Error {}
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Error::Upstream(e) => write!(f, "{}", e),
-            Error::Request(e) => write!(f, "{}", e),
-            Error::Internal(e) => write!(f, "{}", e),
+            Error::Upstream(e) => write!(f, "{e}"),
+            Error::Request(e) => write!(f, "{e}"),
+            Error::Internal(e) => write!(f, "{e}"),
         }
     }
 }
@@ -48,7 +48,7 @@ impl fmt::Display for UpstreamError {
         if let Some(details) = &self.details.as_ref().filter(|d| !d.is_empty()) {
             write!(f, "\nDetails:")?;
             for error in details.iter() {
-                write!(f, "\n- {}", error)?;
+                write!(f, "\n- {error}")?;
             }
         }
         Ok(())

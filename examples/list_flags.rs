@@ -11,7 +11,7 @@ async fn main() -> Result<()> {
     let client = ApiClient::new(config)?;
 
     for f in all_flags(&client.flags()).await? {
-        println!("{:?}", f);
+        println!("{f:?}");
     }
     Ok(())
 }
@@ -22,7 +22,7 @@ async fn all_flags(client: &FlagClient<'_>) -> Result<Vec<Flag>> {
     loop {
         let mut res = client.list(&req).await?;
         all.append(&mut res.flags);
-        if all.len() >= res.total_count || res.next_page_token == "" {
+        if all.len() >= res.total_count || res.next_page_token.is_empty() {
             return Ok(all);
         }
         req.page_token = res.next_page_token;

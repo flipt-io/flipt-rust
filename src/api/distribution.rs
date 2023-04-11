@@ -1,4 +1,4 @@
-use crate::api::{ApiClient, Result};
+use crate::api::{ApiClient, Result, DEFAULT_NAMESPACE};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -11,48 +11,37 @@ impl<'client> DistributionClient<'client> {
         Self { client }
     }
 
-    pub async fn create(
-        &self,
-        flag_key: &str,
-        rule_id: &str,
-        create: &DistributionCreateRequest,
-    ) -> Result<Distribution> {
+    pub async fn create(&self, create: &DistributionCreateRequest) -> Result<Distribution> {
         let path = format!(
-            "/api/v1/flags/{flag_key}/rules/{rule_id}/distributions",
-            flag_key = flag_key,
-            rule_id = rule_id,
+            "/api/v1/namespaces/{namespace_key}/flags/{flag_key}/rules/{rule_id}/distributions",
+            namespace_key = create
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            flag_key = create.flag_key,
+            rule_id = create.rule_id
         );
         self.client.post(&path, Some(create)).await
     }
 
-    pub async fn delete(
-        &self,
-        flag_key: &str,
-        rule_id: &str,
-        id: &str,
-    ) -> Result<DistributionDeletion> {
-        let path = format!(
-            "/api/v1/flags/{flag_key}/rules/{rule_id}/distributions/{id}",
-            flag_key = flag_key,
-            rule_id = rule_id,
-            id = id
+    pub async fn delete(&self, delete: &DistributionDeleteRequest) -> Result<DistributionDeletion> {
+        let path =
+            format!(
+            "/api/v1/namespace/{namespace_key}/flags/{flag_key}/rules/{rule_id}/distributions/{id}",
+            namespace_key = delete.namespace_key.as_ref().unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            flag_key = delete.flag_key,
+            rule_id = delete.rule_id,
+            id = delete.id
         );
         self.client.delete(&path, None::<&()>).await
     }
 
-    pub async fn update(
-        &self,
-        flag_key: &str,
-        rule_id: &str,
-        id: &str,
-        update: &DistributionUpdateRequest,
-    ) -> Result<Distribution> {
-        let path = format!(
-            "/api/v1/flags/{flag_key}/rules/{rule_id}/distributions/{id}",
-            flag_key = flag_key,
-            rule_id = rule_id,
-            id = id,
-        );
+    pub async fn update(&self, update: &DistributionUpdateRequest) -> Result<Distribution> {
+        let path = format!("/api/v1/namespaces/{namespace_key}/flags/{flag_key}/rules/{rule_id}/distributions/{id}",
+            namespace_key = update.namespace_key.as_ref().unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            flag_key = update.flag_key,
+            rule_id = update.rule_id,
+            id = update.id);
         self.client.put(&path, Some(update)).await
     }
 }
@@ -60,6 +49,12 @@ impl<'client> DistributionClient<'client> {
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DistributionCreateRequest {
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
+    #[serde(skip_serializing)]
+    pub flag_key: String,
+    #[serde(skip_serializing)]
+    pub rule_id: String,
     pub rollout: f32,
     pub variant_id: String,
 }
@@ -67,8 +62,24 @@ pub struct DistributionCreateRequest {
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DistributionUpdateRequest {
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
+    #[serde(skip_serializing)]
+    pub flag_key: String,
+    #[serde(skip_serializing)]
+    pub rule_id: String,
+    #[serde(skip_serializing)]
+    pub id: String,
     pub rollout: f32,
     pub variant_id: String,
+}
+
+#[derive(Debug, Default)]
+pub struct DistributionDeleteRequest {
+    pub namespace_key: Option<String>,
+    pub flag_key: String,
+    pub rule_id: String,
+    pub id: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]

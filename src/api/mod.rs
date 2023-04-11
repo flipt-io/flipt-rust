@@ -2,6 +2,7 @@ pub mod constraint;
 pub mod distribution;
 pub mod evaluation;
 pub mod flag;
+pub mod namespace;
 pub mod rule;
 pub mod segment;
 pub mod variant;
@@ -11,6 +12,7 @@ use crate::{AuthScheme, Config};
 use url::Url;
 
 const DEFAULT_LIMIT: usize = 100;
+const DEFAULT_NAMESPACE: &str = "default";
 
 pub type Result<T> = anyhow::Result<T>;
 
@@ -60,6 +62,10 @@ impl ApiClient {
 
     pub fn evaluation(&self) -> evaluation::EvaluationClient {
         evaluation::EvaluationClient::new(self)
+    }
+
+    pub fn namespaces(&self) -> namespace::NamespaceClient {
+        namespace::NamespaceClient::new(self)
     }
 
     pub(crate) async fn get<P, R>(&self, path: &str, params: Option<&P>) -> Result<R>

@@ -1,10 +1,13 @@
 use flipt::api::{
-    constraint::{ComparisonType, Constraint, ConstraintCreateRequest, Operator},
+    constraint::{
+        ComparisonType, Constraint, ConstraintCreateRequest, ConstraintDeleteRequest, Operator,
+    },
     distribution::DistributionCreateRequest,
     evaluation::{EvaluateRequest, Reason},
-    flag::FlagCreateRequest,
-    rule::{Rule, RuleCreateRequest},
-    segment::{Match, SegmentCreateRequest},
+    flag::{FlagCreateRequest, FlagDeleteRequest},
+    namespace::{NamespaceCreateRequest, NamespaceDeleteRequest},
+    rule::{Rule, RuleCreateRequest, RuleDeleteRequest},
+    segment::{Match, SegmentCreateRequest, SegmentDeleteRequest},
     variant::{Variant, VariantCreateRequest},
     ApiClient,
 };
@@ -17,26 +20,85 @@ async fn integration_api() {
     let config = Config::new_from_env().expect("config");
     let client = ApiClient::new(config).expect("build client");
 
-    let _ = client.flags().delete("flag-a").await;
-    let _ = client.variants().delete("flag-a", "variant-a").await;
-    let _ = client.segments().delete("segment-a").await;
+    const NAMESPACE_KEY: &str = "namespace-a";
+    const FLAG_KEY: &str = "flag-a";
+    const VARIANT_KEY: &str = "variant-a";
+    const SEGMENT_KEY: &str = "segment-a";
 
-    create_flag(&client, "flag-a").await;
-    let variant = create_variant(&client, "flag-a", "variant-a").await;
-    create_segment(&client, "segment-a").await;
-    let constraint = create_constraint(&client, "segment-a").await;
-    let rule = create_rule(&client, "flag-a", "segment-a").await;
-    create_distribution(&client, "flag-a", &rule.id, &variant.id).await;
-    evaluate(&client, "flag-a").await;
+    let _ = client
+        .flags()
+        .delete(&FlagDeleteRequest {
+            key: FLAG_KEY.into(),
+            ..Default::default()
+        })
+        .await;
+    let _ = client
+        .segments()
+        .delete(&SegmentDeleteRequest {
+            key: SEGMENT_KEY.into(),
+            ..Default::default()
+        })
+        .await;
 
-    let _ = client.flags().delete("flag-a").await;
-    let _ = client.variants().delete("flag-a", "variant-a").await;
-    let _ = client.segments().delete("segment-a").await;
+    create_flag(&client, FLAG_KEY).await;
+    let variant = create_variant(&client, FLAG_KEY, VARIANT_KEY).await;
+    create_segment(&client, SEGMENT_KEY).await;
+    let constraint = create_constraint(&client, SEGMENT_KEY).await;
+    let rule = create_rule(&client, FLAG_KEY, SEGMENT_KEY).await;
+    create_distribution(&client, FLAG_KEY, &rule.id, &variant.id).await;
+    evaluate(&client, FLAG_KEY).await;
+    create_namespace(&client, NAMESPACE_KEY).await;
+
+    let _ = client
+        .flags()
+        .delete(&FlagDeleteRequest {
+            key: FLAG_KEY.into(),
+            ..Default::default()
+        })
+        .await;
+    let _ = client
+        .segments()
+        .delete(&SegmentDeleteRequest {
+            key: SEGMENT_KEY.into(),
+            ..Default::default()
+        })
+        .await;
     let _ = client
         .constraints()
-        .delete("segment-a", &constraint.id)
+        .delete(&ConstraintDeleteRequest {
+            segment_key: SEGMENT_KEY.into(),
+            id: constraint.id,
+            ..Default::default()
+        })
         .await;
-    let _ = client.rules().delete("flag-a", &rule.id).await;
+    let _ = client
+        .rules()
+        .delete(&RuleDeleteRequest {
+            flag_key: FLAG_KEY.into(),
+            id: rule.id,
+            ..Default::default()
+        })
+        .await;
+    let _ = client.namespaces().delete(&NamespaceDeleteRequest {
+        key: NAMESPACE_KEY.into(),
+    });
+
+    async fn create_namespace(client: &ApiClient, key: &str) {
+        let namespace = client
+            .namespaces()
+            .create(&NamespaceCreateRequest {
+                key: key.into(),
+                name: "Namespace".into(),
+                ..Default::default()
+            })
+            .await
+            .expect("create namespace");
+
+        assert_eq!(namespace.key, key);
+        assert_eq!(namespace.name, "Namespace");
+        assert_eq!(namespace.description, "");
+        assert!(!namespace.protected);
+    }
 
     async fn create_flag(client: &ApiClient, key: &str) {
         let flag = client
@@ -59,14 +121,12 @@ async fn integration_api() {
     async fn create_variant(client: &ApiClient, flag_key: &str, key: &str) -> Variant {
         let variant = client
             .variants()
-            .create(
-                flag_key,
-                &VariantCreateRequest {
-                    key: key.into(),
-                    name: "Variant".into(),
-                    ..Default::default()
-                },
-            )
+            .create(&VariantCreateRequest {
+                flag_key: flag_key.into(),
+                key: key.into(),
+                name: "Variant".into(),
+                ..Default::default()
+            })
             .await
             .expect("create variant");
 
@@ -90,21 +150,20 @@ async fn integration_api() {
         assert_eq!(segment.key, key);
         assert_eq!(segment.name, "Segment");
         assert_eq!(segment.description, "");
-        assert_eq!(segment.match_type, Match::Any);
+        assert_eq!(segment.match_type, Match::All);
     }
 
-    async fn create_constraint(client: &ApiClient, segment: &str) -> Constraint {
+    async fn create_constraint(client: &ApiClient, segment_key: &str) -> Constraint {
         let constraint = client
             .constraints()
-            .create(
-                segment,
-                &ConstraintCreateRequest {
-                    property: "name".into(),
-                    value: "brett".into(),
-                    operator: Operator::Eq,
-                    comparison_type: ComparisonType::String,
-                },
-            )
+            .create(&ConstraintCreateRequest {
+                segment_key: segment_key.into(),
+                property: "name".into(),
+                value: "brett".into(),
+                operator: Operator::Eq,
+                comparison_type: ComparisonType::String,
+                ..Default::default()
+            })
             .await
             .expect("create segment");
 
@@ -120,13 +179,12 @@ async fn integration_api() {
     async fn create_rule(client: &ApiClient, flag_key: &str, segment_key: &str) -> Rule {
         let rule = client
             .rules()
-            .create(
-                flag_key,
-                &RuleCreateRequest {
-                    rank: 1,
-                    segment_key: segment_key.into(),
-                },
-            )
+            .create(&RuleCreateRequest {
+                rank: 1,
+                flag_key: flag_key.into(),
+                segment_key: segment_key.into(),
+                ..Default::default()
+            })
             .await
             .expect("create rule");
 
@@ -147,14 +205,13 @@ async fn integration_api() {
     ) {
         let dist = client
             .distributions()
-            .create(
-                flag_key,
-                rule_id,
-                &DistributionCreateRequest {
-                    rollout: 100.0,
-                    variant_id: variant_id.into(),
-                },
-            )
+            .create(&DistributionCreateRequest {
+                flag_key: flag_key.into(),
+                rule_id: rule_id.into(),
+                rollout: 100.0,
+                variant_id: variant_id.into(),
+                ..Default::default()
+            })
             .await
             .expect("create distribution");
 
