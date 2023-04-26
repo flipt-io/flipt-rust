@@ -1,18 +1,21 @@
-use flipt::api::{
-    constraint::{
-        ComparisonType, Constraint, ConstraintCreateRequest, ConstraintDeleteRequest, Operator,
-    },
-    distribution::DistributionCreateRequest,
-    evaluation::{EvaluateRequest, Reason},
-    flag::{FlagCreateRequest, FlagDeleteRequest},
-    namespace::{NamespaceCreateRequest, NamespaceDeleteRequest},
-    rule::{Rule, RuleCreateRequest, RuleDeleteRequest},
-    segment::{Match, SegmentCreateRequest, SegmentDeleteRequest},
-    variant::{Variant, VariantCreateRequest},
-    ApiClient,
-};
 use flipt::auth::{token::TokenCreateRequest, token::TokenListRequest, AuthClient};
 use flipt::Config;
+use flipt::{
+    api::{
+        constraint::{
+            ComparisonType, Constraint, ConstraintCreateRequest, ConstraintDeleteRequest, Operator,
+        },
+        distribution::DistributionCreateRequest,
+        evaluation::{EvaluateRequest, Reason},
+        flag::{FlagCreateRequest, FlagDeleteRequest},
+        namespace::{NamespaceCreateRequest, NamespaceDeleteRequest},
+        rule::{Rule, RuleCreateRequest, RuleDeleteRequest},
+        segment::{Match, SegmentCreateRequest, SegmentDeleteRequest},
+        variant::{Variant, VariantCreateRequest},
+        ApiClient,
+    },
+    meta::MetaClient,
+};
 
 #[tokio::test]
 #[cfg_attr(not(feature = "flipt_integration"), ignore)]
@@ -288,4 +291,14 @@ async fn integration_auth() {
 
     let me = client.me().await.expect("me");
     assert_ne!(me.id, "");
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "flipt_integration"), ignore)]
+async fn integration_meta() {
+    let config = Config::new_from_env().expect("config");
+    let client = MetaClient::new(config).expect("build client");
+
+    let info = client.info().get().await.expect("info");
+    assert_ne!(info.is_empty(), true);
 }

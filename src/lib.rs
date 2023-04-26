@@ -1,11 +1,13 @@
 pub mod api;
 pub mod auth;
 pub mod error;
+pub mod meta;
 
 use anyhow::Result;
 use std::env;
 use url::Url;
 
+const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 const DEFAULT_USER_AGENT: &str = "flipt-rust";
 
 #[derive(Debug)]
@@ -28,7 +30,7 @@ impl Config {
         Self {
             endpoint,
             auth_scheme,
-            user_agent: DEFAULT_USER_AGENT.into(),
+            user_agent: format!("{}/{}", DEFAULT_USER_AGENT, VERSION.unwrap_or("unknown")),
         }
     }
 
@@ -38,13 +40,23 @@ impl Config {
     }
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Self::new(
+            Url::parse("http://localhost:8080").unwrap(),
+            AuthScheme::None,
+        )
+    }
+}
+
 fn endpoint_from_env() -> Result<Url, url::ParseError> {
     let endpoint = env::var("FLIPT_ENDPOINT").unwrap_or_default();
     Url::parse(&endpoint)
 }
 
 fn user_agent_from_env() -> String {
-    env::var("FLIPT_USER_AGENT").unwrap_or_else(|_| DEFAULT_USER_AGENT.into())
+    env::var("FLIPT_USER_AGENT")
+        .unwrap_or_else(|_| format!("{}/{}", DEFAULT_USER_AGENT, VERSION.unwrap_or("unknown")))
 }
 
 fn auth_scheme_from_env() -> AuthScheme {
