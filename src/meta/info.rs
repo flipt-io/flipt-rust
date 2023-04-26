@@ -10,6 +10,11 @@ impl<'client> InfoClient<'client> {
     }
 
     pub async fn get(&self) -> Result<String> {
-        self.client.get("/meta/info", None::<&()>).await
+        let result: Result<serde_json::Value> = self.client.get("/meta/info", None::<&()>).await;
+
+        match result {
+            Ok(value) => Ok(value.to_string()),
+            Err(e) => Err(e),
+        }
     }
 }
