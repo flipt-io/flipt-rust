@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.0...flipt-v0.4.1) (2023-04-26)
+
+
+### Features
+
+* add meta/info client; add crate version to user-agent ([#13](https://github.com/flipt-io/flipt-rust/issues/13)) ([d1158f9](https://github.com/flipt-io/flipt-rust/commit/d1158f93267ea18efc525e26efa06dc8f594de1a))
+
 ## [0.4.0](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.3.1...flipt-v0.4.0) (2023-04-11)
 
 ### Added
