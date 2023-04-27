@@ -10,7 +10,7 @@ use url::Url;
 const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 const DEFAULT_USER_AGENT: &str = "flipt-rust";
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
     endpoint: Url,
     auth_scheme: AuthScheme,
