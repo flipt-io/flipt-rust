@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.1...flipt-v0.4.2) (2023-04-27)
+
+
+### Features
+
+* impl Clone for Config struct ([#15](https://github.com/flipt-io/flipt-rust/issues/15)) ([4d3f81f](https://github.com/flipt-io/flipt-rust/commit/4d3f81f4ceb1b043e7802d88db26b80f5df77781))
+
 ## [0.4.1](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.0...flipt-v0.4.1) (2023-04-26)
 
 
