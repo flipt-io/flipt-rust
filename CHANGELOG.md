@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.4](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.3...flipt-v0.4.4) (2023-05-02)
+
+
+### Bug Fixes
+
+* use rustls instead of default tls ([#20](https://github.com/flipt-io/flipt-rust/issues/20)) ([4dffb17](https://github.com/flipt-io/flipt-rust/commit/4dffb17bb21bf455b1b08b3e2554492ae768b8ce))
+
 ## [0.4.3](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.2...flipt-v0.4.3) (2023-05-02)
 
 
