@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.2...flipt-v0.4.3) (2023-05-02)
+
+
+### Bug Fixes
+
+* support tls ([#18](https://github.com/flipt-io/flipt-rust/issues/18)) ([e6e6645](https://github.com/flipt-io/flipt-rust/commit/e6e6645b3ca4684512ebf578f5283c986d97809e))
+
 ## [0.4.2](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.1...flipt-v0.4.2) (2023-04-27)
 
 
