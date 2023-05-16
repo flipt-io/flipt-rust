@@ -61,6 +61,7 @@ pub struct ConstraintCreateRequest {
     #[serde(rename = "type")]
     pub comparison_type: ComparisonType,
     pub value: String,
+    pub description: String,
 }
 
 #[derive(Debug, Default, Serialize)]
@@ -76,6 +77,7 @@ pub struct ConstraintUpdateRequest {
     #[serde(rename = "type")]
     pub comparison_type: ComparisonType,
     pub value: String,
+    pub description: String,
 }
 
 #[derive(Debug, Default)]
@@ -143,6 +145,7 @@ pub struct Constraint {
     #[serde(rename = "type")]
     pub comparison_type: ComparisonType,
     pub value: String,
+    pub description: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }

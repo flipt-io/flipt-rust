@@ -165,6 +165,7 @@ async fn integration_api() {
                 value: "brett".into(),
                 operator: Operator::Eq,
                 comparison_type: ComparisonType::String,
+                description: "desc".into(),
                 ..Default::default()
             })
             .await
@@ -175,6 +176,7 @@ async fn integration_api() {
         assert_eq!(constraint.property, "name");
         assert_eq!(constraint.value, "brett");
         assert_eq!(constraint.comparison_type, ComparisonType::String);
+        assert_eq!(constraint.description, "desc");
 
         constraint
     }
