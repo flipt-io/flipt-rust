@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.5](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.4...flipt-v0.4.5) (2023-05-16)
+
+
+### Features
+
+* add description to constraint on client ([2a46798](https://github.com/flipt-io/flipt-rust/commit/2a46798105e4459c806f5a9e34e7728d2e8c7d58))
+
 ## [0.4.4](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.3...flipt-v0.4.4) (2023-05-02)
 
 
