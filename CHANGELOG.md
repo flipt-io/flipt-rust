@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.5](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.4...flipt-v0.4.5) (2023-05-24)
+
+
+### Features
+
+* add datetime comparison type ([#24](https://github.com/flipt-io/flipt-rust/issues/24)) ([e720108](https://github.com/flipt-io/flipt-rust/commit/e720108bcac2e9c7c3aac817a02722a3b7bf6b8c))
+* add description to constraint on client ([2a46798](https://github.com/flipt-io/flipt-rust/commit/2a46798105e4459c806f5a9e34e7728d2e8c7d58))
+
 ## [0.4.4](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.3...flipt-v0.4.4) (2023-05-02)
 
 
