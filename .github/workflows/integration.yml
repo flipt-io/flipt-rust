@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       flipt:
-        image: flipt/flipt:nightly
+        image: flipt/flipt:latest
         env:
           FLIPT_AUTHENTICATION_METHODS_TOKEN_ENABLED: true
           FLIPT_AUTHENTICATION_METHODS_TOKEN_BOOTSTRAP_TOKEN: 1ntegr@t10n
