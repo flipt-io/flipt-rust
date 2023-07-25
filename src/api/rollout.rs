@@ -38,7 +38,7 @@ impl<'client> RolloutClient<'client> {
         self.client.post(&path, Some(create)).await
     }
 
-    pub async fn delete(&self, delete: &RolloutDeleteRequest) -> Result<RolloutDeletion> {
+    pub async fn delete(&self, delete: &RolloutDeleteRequest) -> Result<Empty> {
         let path = format!(
             "/api/v1/namespaces/{namespace_key}/flags/{flag_key}/rollouts/{id}",
             namespace_key = delete
@@ -65,10 +65,33 @@ impl<'client> RolloutClient<'client> {
 
         self.client.put(&path, Some(update)).await
     }
+
+    pub async fn order(&self, order: &RolloutOrderRequest) -> Result<Empty> {
+        let path = format!(
+            "/api/v1/namespaces/{namespace_key}/flags/{flag_key}/rollouts/order",
+            namespace_key = order
+                .namespace_key
+                .as_ref()
+                .unwrap_or(&DEFAULT_NAMESPACE.to_string()),
+            flag_key = order.flag_key,
+        );
+
+        self.client.put(&path, Some(order)).await
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
-pub struct RolloutDeletion {}
+pub struct Empty {}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RolloutOrderRequest {
+    #[serde(skip_serializing)]
+    pub flag_key: String,
+    #[serde(skip_serializing)]
+    pub namespace_key: Option<String>,
+    pub rollout_ids: Vec<String>,
+}
 
 #[derive(Debug, Default, Serialize)]
 pub struct RolloutGetRequest {
@@ -128,9 +151,7 @@ pub struct Rollout {
     pub description: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub threshold: Option<RolloutThreshold>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub segment: Option<RolloutSegment>,
 }
 

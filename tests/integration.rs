@@ -1,5 +1,3 @@
-use flipt::api::evaluation::V2EvaluateRequest;
-use flipt::api::rollout::RolloutSegment;
 use flipt::auth::{token::TokenCreateRequest, token::TokenListRequest, AuthClient};
 use flipt::Config;
 use flipt::{
@@ -8,11 +6,13 @@ use flipt::{
             ComparisonType, Constraint, ConstraintCreateRequest, ConstraintDeleteRequest, Operator,
         },
         distribution::DistributionCreateRequest,
+        evaluate::{EvaluateRequest as V2EvaluateRequest, Reason as V2Reason},
         evaluation::{EvaluateRequest, Reason},
         flag::{FlagCreateRequest, FlagDeleteRequest, FlagType},
         namespace::{NamespaceCreateRequest, NamespaceDeleteRequest},
         rollout::{
-            Rollout, RolloutCreateRequest, RolloutDeleteRequest, RolloutThreshold, RolloutType,
+            Rollout, RolloutCreateRequest, RolloutDeleteRequest, RolloutSegment, RolloutThreshold,
+            RolloutType,
         },
         rule::{Rule, RuleCreateRequest, RuleDeleteRequest},
         segment::{Match, SegmentCreateRequest, SegmentDeleteRequest},
@@ -330,7 +330,7 @@ async fn integration_api() {
 
     async fn boolean_evaluate(client: &ApiClient, flag_key: &str) {
         let boolean_evaluation = client
-            .evaluation()
+            .evaluate()
             .boolean(&V2EvaluateRequest {
                 namespace_key: String::from("default"),
                 flag_key: flag_key.into(),
@@ -341,12 +341,12 @@ async fn integration_api() {
             .expect("boolean evaluation");
 
         assert_eq!(boolean_evaluation.enabled, true);
-        assert_eq!(boolean_evaluation.reason, Reason::Default);
+        assert_eq!(boolean_evaluation.reason, V2Reason::Default);
     }
 
     async fn variant_evaluate(client: &ApiClient, flag_key: &str) {
         let variant_evaluation = client
-            .evaluation()
+            .evaluate()
             .variant(&V2EvaluateRequest {
                 namespace_key: String::from("default"),
                 flag_key: flag_key.into(),
@@ -361,6 +361,7 @@ async fn integration_api() {
             .expect("variant evaluation");
 
         assert_eq!(variant_evaluation.is_match, true);
+        assert_eq!(variant_evaluation.reason, V2Reason::Match);
         assert_eq!(variant_evaluation.segment_key, "segment-a");
         assert_eq!(variant_evaluation.variant_key, "variant-a");
         assert_eq!(variant_evaluation.variant_attachment, "");
