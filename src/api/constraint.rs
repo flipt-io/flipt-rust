@@ -101,6 +101,8 @@ pub enum ComparisonType {
     Number,
     #[serde(rename = "BOOLEAN_COMPARISON_TYPE")]
     Boolean,
+    #[serde(rename = "DATETIME_COMPARISON_TYPE")]
+    DateTime,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone, Eq, PartialEq)]
