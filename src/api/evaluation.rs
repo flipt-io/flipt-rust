@@ -75,7 +75,6 @@ pub struct EvaluateRequest {
 }
 
 #[derive(Debug, Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct V2BatchEvaluateRequest {
     pub requests: Vec<V2EvaluateRequest>,
 }
