@@ -108,7 +108,7 @@ pub struct RolloutDeleteRequest {
     pub id: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 pub enum RolloutType {
     #[serde(rename = "UNKNOWN_ROLLOUT_TYPE")]
     Unknown,
@@ -118,7 +118,7 @@ pub enum RolloutType {
     Threshold,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Rollout {
     pub id: String,
@@ -134,13 +134,13 @@ pub struct Rollout {
     pub segment: Option<RolloutSegment>,
 }
 
-#[derive(Debug, Default, Deserialize, Clone, Eq, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct RolloutThreshold {
-    pub percentage: i32,
+    pub percentage: f32,
     pub value: bool,
 }
 
-#[derive(Debug, Default, Deserialize, Clone, Eq, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RolloutSegment {
     pub segment_key: String,

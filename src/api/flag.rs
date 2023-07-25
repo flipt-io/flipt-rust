@@ -89,6 +89,7 @@ pub struct FlagCreateRequest {
     pub name: String,
     pub description: String,
     pub enabled: bool,
+    pub r#type: FlagType,
 }
 
 #[derive(Debug, Serialize, Default)]
@@ -141,7 +142,7 @@ impl FlagListRequest {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Flag {
     pub namespace_key: String,
@@ -149,15 +150,25 @@ pub struct Flag {
     pub name: String,
     pub description: String,
     pub enabled: bool,
+    pub r#type: FlagType,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub variants: Vec<Variant>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FlagList {
     pub flags: Vec<Flag>,
     pub next_page_token: String,
     pub total_count: usize,
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum FlagType {
+    #[default]
+    #[serde(rename = "VARIANT_FLAG_TYPE")]
+    Variant,
+    #[serde(rename = "BOOLEAN_FLAG_TYPE")]
+    Boolean,
 }

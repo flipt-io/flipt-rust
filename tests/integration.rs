@@ -1,3 +1,5 @@
+use flipt::api::evaluation::V2EvaluateRequest;
+use flipt::api::rollout::RolloutSegment;
 use flipt::auth::{token::TokenCreateRequest, token::TokenListRequest, AuthClient};
 use flipt::Config;
 use flipt::{
@@ -7,8 +9,11 @@ use flipt::{
         },
         distribution::DistributionCreateRequest,
         evaluation::{EvaluateRequest, Reason},
-        flag::{FlagCreateRequest, FlagDeleteRequest},
+        flag::{FlagCreateRequest, FlagDeleteRequest, FlagType},
         namespace::{NamespaceCreateRequest, NamespaceDeleteRequest},
+        rollout::{
+            Rollout, RolloutCreateRequest, RolloutDeleteRequest, RolloutThreshold, RolloutType,
+        },
         rule::{Rule, RuleCreateRequest, RuleDeleteRequest},
         segment::{Match, SegmentCreateRequest, SegmentDeleteRequest},
         variant::{Variant, VariantCreateRequest},
@@ -24,6 +29,7 @@ async fn integration_api() {
     let client = ApiClient::new(config).expect("build client");
 
     const NAMESPACE_KEY: &str = "namespace-a";
+    const BOOLEAN_FLAG_KEY: &str = "flag-boolean";
     const FLAG_KEY: &str = "flag-a";
     const VARIANT_KEY: &str = "variant-a";
     const SEGMENT_KEY: &str = "segment-a";
@@ -43,7 +49,7 @@ async fn integration_api() {
         })
         .await;
 
-    create_flag(&client, FLAG_KEY).await;
+    create_flag(&client, FLAG_KEY, FlagType::Variant).await;
     let variant = create_variant(&client, FLAG_KEY, VARIANT_KEY).await;
     create_segment(&client, SEGMENT_KEY).await;
     let constraint = create_constraint(&client, SEGMENT_KEY).await;
@@ -51,6 +57,14 @@ async fn integration_api() {
     create_distribution(&client, FLAG_KEY, &rule.id, &variant.id).await;
     evaluate(&client, FLAG_KEY).await;
     create_namespace(&client, NAMESPACE_KEY).await;
+
+    // rollouts
+    create_flag(&client, BOOLEAN_FLAG_KEY, FlagType::Boolean).await;
+    let threshold_rollout = create_threshold_rollout(&client, BOOLEAN_FLAG_KEY).await;
+    let segment_rollout = create_segment_rollout(&client, BOOLEAN_FLAG_KEY, SEGMENT_KEY).await;
+
+    boolean_evaluate(&client, BOOLEAN_FLAG_KEY).await;
+    variant_evaluate(&client, FLAG_KEY).await;
 
     let _ = client
         .flags()
@@ -85,6 +99,24 @@ async fn integration_api() {
     let _ = client.namespaces().delete(&NamespaceDeleteRequest {
         key: NAMESPACE_KEY.into(),
     });
+    let _ = client
+        .flags()
+        .delete(&FlagDeleteRequest {
+            key: BOOLEAN_FLAG_KEY.into(),
+            ..Default::default()
+        })
+        .await;
+
+    delete_rollout(&client, BOOLEAN_FLAG_KEY, &threshold_rollout.id).await;
+    delete_rollout(&client, BOOLEAN_FLAG_KEY, &segment_rollout.id).await;
+
+    let _ = client
+        .namespaces()
+        .delete(&NamespaceDeleteRequest {
+            key: NAMESPACE_KEY.into(),
+            ..Default::default()
+        })
+        .await;
 
     async fn create_namespace(client: &ApiClient, key: &str) {
         let namespace = client
@@ -103,20 +135,72 @@ async fn integration_api() {
         assert!(!namespace.protected);
     }
 
-    async fn create_flag(client: &ApiClient, key: &str) {
+    async fn create_threshold_rollout(client: &ApiClient, flag_key: &str) -> Rollout {
+        let rollout = client
+            .rollouts()
+            .create(&RolloutCreateRequest {
+                flag_key: flag_key.into(),
+                rank: 1,
+                threshold: Some(RolloutThreshold {
+                    percentage: 50.0,
+                    value: true,
+                }),
+                ..Default::default()
+            })
+            .await
+            .expect("create threshold rollout");
+
+        assert_eq!(rollout.id.is_empty(), false);
+        assert_eq!(rollout.rank, 1);
+        assert_eq!(rollout.description, "");
+        assert_eq!(rollout.rollout_type, RolloutType::Threshold);
+
+        rollout
+    }
+
+    async fn create_segment_rollout(
+        client: &ApiClient,
+        flag_key: &str,
+        segment_key: &str,
+    ) -> Rollout {
+        let rollout = client
+            .rollouts()
+            .create(&RolloutCreateRequest {
+                flag_key: flag_key.into(),
+                rank: 2,
+                segment: Some(RolloutSegment {
+                    segment_key: segment_key.into(),
+                    value: true,
+                }),
+                ..Default::default()
+            })
+            .await
+            .expect("create segment rollout");
+
+        assert_eq!(rollout.id.is_empty(), false);
+        assert_eq!(rollout.rank, 2);
+        assert_eq!(rollout.description, "");
+        assert_eq!(rollout.rollout_type, RolloutType::Segment);
+
+        rollout
+    }
+
+    async fn create_flag(client: &ApiClient, key: &str, flag_type: FlagType) {
         let flag = client
             .flags()
             .create(&FlagCreateRequest {
                 key: key.into(),
-                name: "Flag".into(),
+                name: key.into(),
                 enabled: true,
+                r#type: flag_type,
                 ..Default::default()
             })
             .await
             .expect("create flag");
 
         assert_eq!(flag.key, key);
-        assert_eq!(flag.name, "Flag");
+        assert_eq!(flag.name, key);
+        assert_eq!(flag.r#type, flag_type);
         assert_eq!(flag.description, "");
         assert!(flag.enabled);
     }
@@ -242,6 +326,55 @@ async fn integration_api() {
             .expect("eval");
         assert!(eval.is_match);
         assert_eq!(eval.reason, Reason::Match);
+    }
+
+    async fn boolean_evaluate(client: &ApiClient, flag_key: &str) {
+        let boolean_evaluation = client
+            .evaluation()
+            .boolean(&V2EvaluateRequest {
+                namespace_key: String::from("default"),
+                flag_key: flag_key.into(),
+                entity_id: String::from("foo"),
+                ..Default::default()
+            })
+            .await
+            .expect("boolean evaluation");
+
+        assert_eq!(boolean_evaluation.enabled, true);
+        assert_eq!(boolean_evaluation.reason, Reason::Default);
+    }
+
+    async fn variant_evaluate(client: &ApiClient, flag_key: &str) {
+        let variant_evaluation = client
+            .evaluation()
+            .variant(&V2EvaluateRequest {
+                namespace_key: String::from("default"),
+                flag_key: flag_key.into(),
+                entity_id: String::from("foo"),
+                context: std::collections::HashMap::from([(
+                    String::from("name"),
+                    String::from("brett"),
+                )]),
+                ..Default::default()
+            })
+            .await
+            .expect("variant evaluation");
+
+        assert_eq!(variant_evaluation.is_match, true);
+        assert_eq!(variant_evaluation.segment_key, "segment-a");
+        assert_eq!(variant_evaluation.variant_key, "variant-a");
+        assert_eq!(variant_evaluation.variant_attachment, "");
+    }
+
+    async fn delete_rollout(client: &ApiClient, flag_key: &str, id: &str) {
+        let _ = client
+            .rollouts()
+            .delete(&RolloutDeleteRequest {
+                flag_key: flag_key.into(),
+                id: id.into(),
+                ..Default::default()
+            })
+            .await;
     }
 }
 
