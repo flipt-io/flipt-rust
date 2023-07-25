@@ -33,6 +33,24 @@ impl<'client> EvaluationClient<'client> {
         );
         self.client.post(&path, Some(batch)).await
     }
+
+    pub async fn boolean(&self, eval: &EvaluateV2Request) -> Result<BooleanEvaluation> {
+        let path = "/evaluate/v1/boolean".to_string();
+
+        self.client.post(&path, Some(eval)).await
+    }
+
+    pub async fn variant(&self, eval: &EvaluateV2Request) -> Result<VariantEvaluation> {
+        let path = "/evaluate/v1/variant".to_string();
+
+        self.client.post(&path, Some(eval)).await
+    }
+
+    pub async fn batch(&self, batch: &BatchRequest) -> Result<V2BatchEvaluation> {
+        let path = "/evaluate/v1/batch".to_string();
+
+        self.client.post(&path, Some(batch)).await
+    }
 }
 
 #[derive(Debug, Default, Serialize)]
@@ -54,6 +72,21 @@ pub struct EvaluateRequest {
     pub namespace_key: Option<String>,
     pub flag_key: String,
     pub request_id: String,
+}
+
+#[derive(Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BatchRequest {
+    pub requests: Vec<EvaluateV2Request>,
+}
+
+#[derive(Debug, Default, Clone, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EvaluateV2Request {
+    pub context: HashMap<String, String>,
+    pub entity_id: String,
+    pub namespace_key: String,
+    pub flag_key: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -82,6 +115,54 @@ pub struct Evaluation {
     pub value: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BooleanEvaluation {
+    pub enabled: bool,
+    pub reason: Reason,
+    pub request_id: String,
+    pub request_duration_millis: f64,
+    pub timestamp: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VariantEvaluation {
+    #[serde(rename = "match")]
+    pub is_match: bool,
+    pub segment_key: String,
+    pub reason: Reason,
+    pub variant_key: String,
+    pub variant_attachment: String,
+    pub request_id: String,
+    pub request_duration_millis: f64,
+    pub timestamp: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct V2BatchEvaluation {
+    #[serde(rename = "type")]
+    pub is_type: ResponseType,
+    pub responses: Vec<V2Response>,
+    pub request_duration_millis: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct V2Response {
+    pub boolean_response: Option<BooleanEvaluation>,
+    pub variant_response: Option<VariantEvaluation>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
+pub enum ResponseType {
+    #[serde(rename = "VARIANT_EVALUATION_RESPONSE_TYPE")]
+    Variant,
+    #[serde(rename = "BOOLEAN_EVALUATION_RESPONSE_TYPE")]
+    Boolean,
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
 pub enum Reason {
     #[serde(rename = "UNKNOWN_EVALUATION_REASON")]
@@ -94,4 +175,6 @@ pub enum Reason {
     Match,
     #[serde(rename = "ERROR_EVALUATION_REASON")]
     Error,
+    #[serde(rename = "DEFAULT_EVALUATION_REASON")]
+    Default,
 }
