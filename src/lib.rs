@@ -1,7 +1,7 @@
 pub mod api;
 pub mod auth;
 pub mod error;
-pub mod evaluate;
+pub mod evaluation;
 pub mod meta;
 
 use anyhow::Result;

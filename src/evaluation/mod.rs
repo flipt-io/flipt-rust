@@ -3,11 +3,11 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub struct EvaluateClient<'client> {
+pub struct EvaluationClient<'client> {
     client: &'client ApiClient,
 }
 
-impl<'client> EvaluateClient<'client> {
+impl<'client> EvaluationClient<'client> {
     pub fn new(client: &'client ApiClient) -> Self {
         Self { client }
     }

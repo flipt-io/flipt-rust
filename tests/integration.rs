@@ -1,5 +1,7 @@
 use flipt::auth::{token::TokenCreateRequest, token::TokenListRequest, AuthClient};
-use flipt::evaluate::{EvaluateClient, EvaluateRequest as V2EvaluateRequest, Reason as V2Reason};
+use flipt::evaluation::{
+    EvaluateRequest as V2EvaluateRequest, EvaluationClient, Reason as V2Reason,
+};
 use flipt::Config;
 use flipt::{
     api::{
@@ -63,7 +65,7 @@ async fn integration_api() {
     let threshold_rollout = create_threshold_rollout(&client, BOOLEAN_FLAG_KEY).await;
     let segment_rollout = create_segment_rollout(&client, BOOLEAN_FLAG_KEY, SEGMENT_KEY).await;
 
-    let evaluate_client = EvaluateClient::new(&client);
+    let evaluate_client = EvaluationClient::new(&client);
     boolean_evaluate(&evaluate_client, BOOLEAN_FLAG_KEY).await;
     variant_evaluate(&evaluate_client, FLAG_KEY).await;
 
@@ -329,7 +331,7 @@ async fn integration_api() {
         assert_eq!(eval.reason, Reason::Match);
     }
 
-    async fn boolean_evaluate(client: &EvaluateClient<'_>, flag_key: &str) {
+    async fn boolean_evaluate(client: &EvaluationClient<'_>, flag_key: &str) {
         let boolean_evaluation = client
             .boolean(&V2EvaluateRequest {
                 namespace_key: String::from("default"),
@@ -344,7 +346,7 @@ async fn integration_api() {
         assert_eq!(boolean_evaluation.reason, V2Reason::Default);
     }
 
-    async fn variant_evaluate(client: &EvaluateClient<'_>, flag_key: &str) {
+    async fn variant_evaluate(client: &EvaluationClient<'_>, flag_key: &str) {
         let variant_evaluation = client
             .variant(&V2EvaluateRequest {
                 namespace_key: String::from("default"),
