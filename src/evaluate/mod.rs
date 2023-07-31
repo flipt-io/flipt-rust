@@ -60,7 +60,7 @@ pub struct BooleanEvaluation {
 pub struct VariantEvaluation {
     #[serde(rename = "match")]
     pub is_match: bool,
-    pub segment_key: String,
+    pub segment_keys: Vec<String>,
     pub reason: Reason,
     pub variant_key: String,
     pub variant_attachment: String,

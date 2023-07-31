@@ -361,7 +361,7 @@ async fn integration_api() {
 
         assert_eq!(variant_evaluation.is_match, true);
         assert_eq!(variant_evaluation.reason, V2Reason::Match);
-        assert_eq!(variant_evaluation.segment_key, "segment-a");
+        assert_eq!(variant_evaluation.segment_keys[0], "segment-a");
         assert_eq!(variant_evaluation.variant_key, "variant-a");
         assert_eq!(variant_evaluation.variant_attachment, "");
     }
