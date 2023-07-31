@@ -89,7 +89,7 @@ pub struct FlagCreateRequest {
     pub name: String,
     pub description: String,
     pub enabled: bool,
-    pub r#type: FlagType,
+    pub r#type: Option<FlagType>,
 }
 
 #[derive(Debug, Serialize, Default)]
@@ -150,7 +150,7 @@ pub struct Flag {
     pub name: String,
     pub description: String,
     pub enabled: bool,
-    pub r#type: FlagType,
+    pub r#type: Option<FlagType>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub variants: Vec<Variant>,

@@ -193,7 +193,7 @@ async fn integration_api() {
                 key: key.into(),
                 name: key.into(),
                 enabled: true,
-                r#type: flag_type,
+                r#type: Some(flag_type),
                 ..Default::default()
             })
             .await
@@ -201,7 +201,7 @@ async fn integration_api() {
 
         assert_eq!(flag.key, key);
         assert_eq!(flag.name, key);
-        assert_eq!(flag.r#type, flag_type);
+        assert_eq!(flag.r#type.unwrap(), flag_type);
         assert_eq!(flag.description, "");
         assert!(flag.enabled);
     }
