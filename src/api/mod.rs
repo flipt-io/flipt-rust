@@ -1,6 +1,5 @@
 pub mod constraint;
 pub mod distribution;
-pub mod evaluate;
 pub mod evaluation;
 pub mod flag;
 pub mod namespace;
@@ -68,10 +67,6 @@ impl ApiClient {
 
     pub fn evaluation(&self) -> evaluation::EvaluationClient {
         evaluation::EvaluationClient::new(self)
-    }
-
-    pub fn evaluate(&self) -> evaluate::EvaluateClient {
-        evaluate::EvaluateClient::new(self)
     }
 
     pub fn namespaces(&self) -> namespace::NamespaceClient {

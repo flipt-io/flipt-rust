@@ -1,4 +1,5 @@
 use flipt::auth::{token::TokenCreateRequest, token::TokenListRequest, AuthClient};
+use flipt::evaluate::{EvaluateClient, EvaluateRequest as V2EvaluateRequest, Reason as V2Reason};
 use flipt::Config;
 use flipt::{
     api::{
@@ -6,7 +7,6 @@ use flipt::{
             ComparisonType, Constraint, ConstraintCreateRequest, ConstraintDeleteRequest, Operator,
         },
         distribution::DistributionCreateRequest,
-        evaluate::{EvaluateRequest as V2EvaluateRequest, Reason as V2Reason},
         evaluation::{EvaluateRequest, Reason},
         flag::{FlagCreateRequest, FlagDeleteRequest, FlagType},
         namespace::{NamespaceCreateRequest, NamespaceDeleteRequest},
@@ -63,8 +63,9 @@ async fn integration_api() {
     let threshold_rollout = create_threshold_rollout(&client, BOOLEAN_FLAG_KEY).await;
     let segment_rollout = create_segment_rollout(&client, BOOLEAN_FLAG_KEY, SEGMENT_KEY).await;
 
-    boolean_evaluate(&client, BOOLEAN_FLAG_KEY).await;
-    variant_evaluate(&client, FLAG_KEY).await;
+    let evaluate_client = EvaluateClient::new(&client);
+    boolean_evaluate(&evaluate_client, BOOLEAN_FLAG_KEY).await;
+    variant_evaluate(&evaluate_client, FLAG_KEY).await;
 
     let _ = client
         .flags()
@@ -328,9 +329,8 @@ async fn integration_api() {
         assert_eq!(eval.reason, Reason::Match);
     }
 
-    async fn boolean_evaluate(client: &ApiClient, flag_key: &str) {
+    async fn boolean_evaluate(client: &EvaluateClient<'_>, flag_key: &str) {
         let boolean_evaluation = client
-            .evaluate()
             .boolean(&V2EvaluateRequest {
                 namespace_key: String::from("default"),
                 flag_key: flag_key.into(),
@@ -344,9 +344,8 @@ async fn integration_api() {
         assert_eq!(boolean_evaluation.reason, V2Reason::Default);
     }
 
-    async fn variant_evaluate(client: &ApiClient, flag_key: &str) {
+    async fn variant_evaluate(client: &EvaluateClient<'_>, flag_key: &str) {
         let variant_evaluation = client
-            .evaluate()
             .variant(&V2EvaluateRequest {
                 namespace_key: String::from("default"),
                 flag_key: flag_key.into(),
