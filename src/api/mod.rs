@@ -3,6 +3,7 @@ pub mod distribution;
 pub mod evaluation;
 pub mod flag;
 pub mod namespace;
+pub mod rollout;
 pub mod rule;
 pub mod segment;
 pub mod variant;
@@ -54,6 +55,10 @@ impl ApiClient {
 
     pub fn distributions(&self) -> distribution::DistributionClient {
         distribution::DistributionClient::new(self)
+    }
+
+    pub fn rollouts(&self) -> rollout::RolloutClient {
+        rollout::RolloutClient::new(self)
     }
 
     pub fn rules(&self) -> rule::RuleClient {

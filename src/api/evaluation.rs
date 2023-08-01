@@ -45,7 +45,7 @@ pub struct BatchEvaluateRequest {
     pub request_id: String,
 }
 
-#[derive(Debug, Default, Clone, Eq, PartialEq, Serialize)]
+#[derive(Debug, Default, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluateRequest {
     pub context: HashMap<String, String>,
@@ -94,4 +94,6 @@ pub enum Reason {
     Match,
     #[serde(rename = "ERROR_EVALUATION_REASON")]
     Error,
+    #[serde(rename = "DEFAULT_EVALUATION_REASON")]
+    Default,
 }
