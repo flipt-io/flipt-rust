@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.6](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.5...flipt-v0.4.6) (2023-08-01)
+
+
+### Features
+
+* **evaluate_v2:** Add evaluate code for new v2 endpoints ([ee77b91](https://github.com/flipt-io/flipt-rust/commit/ee77b91f8aa68fa55bf2c1ad1fae3458c4e2eeb7))
+* **rollouts:** feat(rollouts):  ([82407b6](https://github.com/flipt-io/flipt-rust/commit/82407b6101ee0df20eb050f36745f1c612fc26c2))
+* **rollouts:** Add CRUD code for rollouts ([4c605a0](https://github.com/flipt-io/flipt-rust/commit/4c605a065c19b118125ddb6099587b080aa9f022))
+
 ## [0.4.5](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.4...flipt-v0.4.5) (2023-05-24)
 
 
