@@ -161,9 +161,20 @@ pub struct RolloutThreshold {
     pub value: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RolloutSegment {
-    pub segment_key: String,
+    pub segment_key: Option<String>,
+    pub segment_keys: Option<Vec<String>>,
+    pub segment_operator: Option<SegmentOperator>,
     pub value: bool,
+}
+
+#[derive(Debug, Default, Deserialize, Serialize, Clone, PartialEq)]
+pub enum SegmentOperator {
+    #[default]
+    #[serde(rename = "OR_SEGMENT_OPERATOR")]
+    Or,
+    #[serde(rename = "AND_SEGMENT_OPERATOR")]
+    And,
 }
