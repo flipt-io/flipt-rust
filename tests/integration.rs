@@ -172,8 +172,9 @@ async fn integration_api() {
                 flag_key: flag_key.into(),
                 rank: 2,
                 segment: Some(RolloutSegment {
-                    segment_key: segment_key.into(),
+                    segment_key: Some(segment_key.into()),
                     value: true,
+                    ..Default::default()
                 }),
                 ..Default::default()
             })
@@ -274,7 +275,7 @@ async fn integration_api() {
             .create(&RuleCreateRequest {
                 rank: 1,
                 flag_key: flag_key.into(),
-                segment_key: segment_key.into(),
+                segment_key: Some(segment_key.into()),
                 ..Default::default()
             })
             .await
@@ -283,7 +284,7 @@ async fn integration_api() {
         assert!(rule.id.len() != 0);
         assert_eq!(rule.flag_key, flag_key);
         assert_eq!(rule.rank, 1u32);
-        assert_eq!(rule.segment_key, "segment-a");
+        assert_eq!(rule.segment_key, Some("segment-a".into()));
         assert_eq!(rule.distributions, (&[]).to_vec());
 
         rule

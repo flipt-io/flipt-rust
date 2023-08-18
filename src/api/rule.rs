@@ -90,8 +90,19 @@ pub struct RuleCreateRequest {
     pub namespace_key: Option<String>,
     #[serde(skip_serializing)]
     pub flag_key: String,
-    pub segment_key: String,
+    pub segment_key: Option<String>,
+    pub segment_keys: Option<Vec<String>>,
+    pub segment_operator: Option<SegmentOperator>,
     pub rank: usize,
+}
+
+#[derive(Debug, Default, Deserialize, Serialize, Clone, PartialEq)]
+pub enum SegmentOperator {
+    #[default]
+    #[serde(rename = "OR_SEGMENT_OPERATOR")]
+    Or,
+    #[serde(rename = "AND_SEGMENT_OPERATOR")]
+    And,
 }
 
 #[derive(Debug, Default, Serialize)]
@@ -103,7 +114,9 @@ pub struct RuleUpdateRequest {
     pub flag_key: String,
     #[serde(skip_serializing)]
     pub id: String,
-    pub segment_key: String,
+    pub segment_key: Option<String>,
+    pub segment_keys: Option<Vec<String>>,
+    pub segment_operator: Option<SegmentOperator>,
     pub rank: u32,
 }
 
@@ -158,7 +171,9 @@ pub struct Rule {
     pub id: String,
     pub rank: u32,
     pub distributions: Vec<Distribution>,
-    pub segment_key: String,
+    pub segment_key: Option<String>,
+    pub segment_keys: Option<Vec<String>>,
+    pub segment_operator: Option<SegmentOperator>,
     pub flag_key: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
