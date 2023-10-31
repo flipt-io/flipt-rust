@@ -2,7 +2,7 @@
 name = "flipt"
 description = "Official Rust SDK for Flipt"
 repository = "https://github.com/flipt-io/flipt-rust.git"
-version = "0.4.6"
+version = "0.5.0"
 edition = "2021"
 authors = ["Brett Buddin <brett@buddin.org>", "Flipt Developers <dev@flipt.io>"]
 readme = "README.md"

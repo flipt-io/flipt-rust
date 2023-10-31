@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.6...flipt-v0.5.0) (2023-10-31)
+
+
+### Features
+
+* add flag_key to VariantEvaluationResponse and BooleanEvaluationResponse ([#29](https://github.com/flipt-io/flipt-rust/issues/29)) ([7651a6b](https://github.com/flipt-io/flipt-rust/commit/7651a6bea8f0817e7f5035d23d52d32c9824079c))
+
+
+### Miscellaneous Chores
+
+* release 0.5.0 ([662e6bd](https://github.com/flipt-io/flipt-rust/commit/662e6bdaeafe562ec3c44ce2e3b994b2418ce4f6))
+
 ## [0.4.6](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.5...flipt-v0.4.6) (2023-08-01)
 
 
