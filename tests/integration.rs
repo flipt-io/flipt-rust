@@ -345,6 +345,7 @@ async fn integration_api() {
 
         assert_eq!(boolean_evaluation.enabled, true);
         assert_eq!(boolean_evaluation.reason, V2Reason::Default);
+        assert_eq!(boolean_evaluation.flag_key, flag_key);
     }
 
     async fn variant_evaluate(client: &EvaluationClient<'_>, flag_key: &str) {
@@ -367,6 +368,7 @@ async fn integration_api() {
         assert_eq!(variant_evaluation.segment_keys[0], "segment-a");
         assert_eq!(variant_evaluation.variant_key, "variant-a");
         assert_eq!(variant_evaluation.variant_attachment, "");
+        assert_eq!(variant_evaluation.flag_key, flag_key);
     }
 
     async fn delete_rollout(client: &ApiClient, flag_key: &str, id: &str) {
