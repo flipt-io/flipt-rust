@@ -53,6 +53,7 @@ pub struct BooleanEvaluation {
     pub request_id: String,
     pub request_duration_millis: f64,
     pub timestamp: DateTime<Utc>,
+    pub flag_key: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -67,6 +68,7 @@ pub struct VariantEvaluation {
     pub request_id: String,
     pub request_duration_millis: f64,
     pub timestamp: DateTime<Utc>,
+    pub flag_key: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
