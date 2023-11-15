@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.5.0...flipt-v0.6.0) (2023-11-15)
+
+
+### Features
+
+* add namespace scope for creation of tokens ([#32](https://github.com/flipt-io/flipt-rust/issues/32)) ([ccf68ba](https://github.com/flipt-io/flipt-rust/commit/ccf68ba08cdb771640991c452de5e31a6b90ba5f))
+
 ## [0.5.0](https://github.com/flipt-io/flipt-rust/compare/flipt-v0.4.6...flipt-v0.5.0) (2023-10-31)
 
 
