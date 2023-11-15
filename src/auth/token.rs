@@ -40,6 +40,7 @@ pub struct TokenCreateRequest {
     pub name: String,
     pub description: String,
     pub expires_at: Option<DateTime<Utc>>,
+    pub namespace_key: String,
 }
 
 impl Default for TokenCreateRequest {
@@ -48,6 +49,7 @@ impl Default for TokenCreateRequest {
             name: "".into(),
             description: "".into(),
             expires_at: None,
+            namespace_key: "".into(),
         }
     }
 }

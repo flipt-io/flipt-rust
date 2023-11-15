@@ -9,6 +9,7 @@ use url::Url;
 
 pub const METADATA_LABEL_NAME: &str = "io.flipt.auth.token.name";
 pub const METADATA_LABEL_DESCRIPTION: &str = "io.flipt.auth.token.description";
+pub const METADATA_LABEL_NAMESPACE: &str = "io.flipt.auth.token.namespace";
 
 const DEFAULT_LIMIT: usize = 100;
 

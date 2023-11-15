@@ -401,7 +401,8 @@ async fn integration_auth() {
         }
     }
 
-    let token = client
+    // Token with no namespace scope.
+    let token_no_namespace = client
         .tokens()
         .create(&TokenCreateRequest {
             name: "e2e".into(),
@@ -410,10 +411,10 @@ async fn integration_auth() {
         })
         .await
         .expect("create token");
-    assert_ne!(token.authentication.id, "");
-    assert_eq!(token.authentication.expires_at, None);
+    assert_ne!(token_no_namespace.authentication.id, "");
+    assert_eq!(token_no_namespace.authentication.expires_at, None);
 
-    let metadata = token.authentication.metadata;
+    let metadata = token_no_namespace.authentication.metadata;
     assert_eq!(
         metadata
             .get(&String::from(flipt::auth::METADATA_LABEL_NAME))
@@ -426,8 +427,48 @@ async fn integration_auth() {
             .expect("description from metadata"),
         "foobar"
     );
+    assert!(metadata
+        .get(&String::from(flipt::auth::METADATA_LABEL_NAMESPACE))
+        .is_none(),);
 
-    let _ = client.tokens().delete(&token.authentication.id).await;
+    // Token with "default" namespace scope.
+    let token_default_scope = client
+        .tokens()
+        .create(&TokenCreateRequest {
+            name: "e2e".into(),
+            description: "foobar".into(),
+            namespace_key: "default".into(),
+            ..Default::default()
+        })
+        .await
+        .expect("create token");
+    assert_ne!(token_default_scope.authentication.id, "");
+    assert_eq!(token_default_scope.authentication.expires_at, None);
+
+    let metadata = token_default_scope.authentication.metadata;
+    assert_eq!(
+        metadata
+            .get(&String::from(flipt::auth::METADATA_LABEL_NAME))
+            .expect("name from metadata"),
+        "e2e"
+    );
+    assert_eq!(
+        metadata
+            .get(&String::from(flipt::auth::METADATA_LABEL_DESCRIPTION))
+            .expect("description from metadata"),
+        "foobar"
+    );
+    assert_eq!(
+        metadata
+            .get(&String::from(flipt::auth::METADATA_LABEL_NAMESPACE))
+            .expect("namespace from metadata"),
+        "default"
+    );
+
+    let _ = client
+        .tokens()
+        .delete(&token_no_namespace.authentication.id)
+        .await;
 
     let me = client.me().await.expect("me");
     assert_ne!(me.id, "");
