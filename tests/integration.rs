@@ -437,7 +437,7 @@ async fn integration_auth() {
         .create(&TokenCreateRequest {
             name: "e2e".into(),
             description: "foobar".into(),
-            namespace_key: "default".into(),
+            namespace_key: Some("default".into()),
             ..Default::default()
         })
         .await
