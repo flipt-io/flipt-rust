@@ -1,7 +1,9 @@
-# Flipt Rust Library
+# Flipt Rust Library (Deprecated)
 
-[![crates.io](https://img.shields.io/crates/v/flipt.svg)](https://crates.io/crates/flipt)
-![hardening](https://img.shields.io/badge/status-hardening-orange)
+![deprecated](https://img.shields.io/badge/status-deprecated-red)
+
+> [!NOTE]
+> This SDK is deprecated and will not be maintained going forward. Please use the new [Flipt Server Rust SDK](https://github.com/flipt-io/flipt-server-sdks/tree/main/flipt-rust) instead.
 
 ## Documentation
 
